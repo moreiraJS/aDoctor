@@ -14,9 +14,22 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class ISAnalyzer extends ClassSmellAnalyzer {
-    private static List<Pair<Type, String>> getInternalFields(TypeDeclaration typeDecl) {
+
+    private static boolean checkEncapsulation(FieldDeclaration fieldDecl, int modifiers){
+        if(modifiers == Modifier.NONE)
+            return true;
+        else if(modifiers < 0){
+            modifiers = ~modifiers;
+            return (fieldDecl.getModifiers() & modifiers) == 0;
+        } else
+            return (fieldDecl.getModifiers() & modifiers) != 0;
+
+    }
+
+    public static List<Pair<Type, String>> getInternalFields(TypeDeclaration typeDecl, int modifiers) {
         FieldDeclaration[] fieldDecls = typeDecl.getFields();
         return Arrays.stream(fieldDecls)
+                .filter(fieldDeclaration -> checkEncapsulation(fieldDeclaration, modifiers))
                 .map(fieldDeclaration -> (List<VariableDeclarationFragment>) fieldDeclaration.fragments())
                 .flatMap(List::stream)
                 .map(field -> new MutablePair<>(((FieldDeclaration) field.getParent()).getType(), field.getName().getIdentifier()))
@@ -24,7 +37,7 @@ public class ISAnalyzer extends ClassSmellAnalyzer {
     }
 
     // TODO: Use streams for smarter code like getInternalFields
-    private static List<Pair<MethodDeclaration, String>> getSetters(TypeDeclaration typeDecl,
+    public static List<Pair<MethodDeclaration, String>> getSetters(TypeDeclaration typeDecl,
                                                              List<Pair<Type, String>> instanceVars) {
         MethodDeclaration[] methods = typeDecl.getMethods();
         List<Pair<MethodDeclaration, String>> setters = new ArrayList<>();
@@ -65,7 +78,7 @@ public class ISAnalyzer extends ClassSmellAnalyzer {
         }
         TypeDeclaration typeDecl = classBean.getTypeDeclaration();
         // Fetch all instance variables names
-        List<Pair<Type, String>> internalFields = getInternalFields(typeDecl);
+        List<Pair<Type, String>> internalFields = getInternalFields(typeDecl, Modifier.NONE);
 
         // Fetch all setters
         List<Pair<MethodDeclaration, String>> internalSetters = getSetters(typeDecl, internalFields);

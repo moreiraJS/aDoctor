@@ -16,7 +16,7 @@ public class MIMAnalyzer extends ClassSmellAnalyzer {
     private IVariableBinding[] superFields;
     private IMethodBinding[] superMethods;
 
-    private static boolean useInternalProperties(MethodDeclaration methodDecl, List<SimpleName> internalFields,
+    public static boolean useInternalProperties(MethodDeclaration methodDecl, List<SimpleName> internalFields,
                                                  IVariableBinding[] superFields, IMethodBinding[] superMethods) {
         List<SimpleName> localNames = new ArrayList<>();
         List<SimpleName> names = ASTUtilities.getSimpleNames(methodDecl);
@@ -42,13 +42,13 @@ public class MIMAnalyzer extends ClassSmellAnalyzer {
         return false;
     }
 
-    private static boolean isOverride(MethodDeclaration methodDecl, IMethodBinding[] superMethods) {
+    public static boolean isOverride(MethodDeclaration methodDecl, IMethodBinding[] superMethods) {
         String methodName = methodDecl.getName().getIdentifier();
         // Check if the analyzed method IS an overriden method
         return Arrays.stream(superMethods).anyMatch(sMethod -> sMethod.getName().equals(methodName));
     }
 
-    private static boolean doesInternalCall(MethodDeclaration methodDecl) {
+    public static boolean doesInternalCall(MethodDeclaration methodDecl) {
         List<MethodInvocation> methodInvocations = ASTUtilities.getMethodInvocations(methodDecl);
         if (methodInvocations != null) {
             for (MethodInvocation methodInvocation : methodInvocations) {
@@ -60,7 +60,7 @@ public class MIMAnalyzer extends ClassSmellAnalyzer {
         return false;
     }
 
-    private static boolean hasOverrideAnnotation(MethodDeclaration methodDecl) {
+    public static boolean hasOverrideAnnotation(MethodDeclaration methodDecl) {
         List<IExtendedModifier> modifiers = (List<IExtendedModifier>) methodDecl.modifiers();
         for (IExtendedModifier modifier : modifiers) {
             if (modifier.isAnnotation()) {
@@ -74,7 +74,7 @@ public class MIMAnalyzer extends ClassSmellAnalyzer {
     }
 
     // Iterative call to get all super fields
-    private static IVariableBinding[] getAllSuperFields(ITypeBinding iTypeBinding) {
+    public static IVariableBinding[] getAllSuperFields(ITypeBinding iTypeBinding) {
         Set<IVariableBinding> allSuperFields = new HashSet<>();
         Optional<ITypeBinding> superclass = Optional.ofNullable(iTypeBinding.getSuperclass());
         while (superclass.isPresent() && !superclass.get().getName().equals(OBJECT)) {
@@ -85,7 +85,7 @@ public class MIMAnalyzer extends ClassSmellAnalyzer {
     }
 
     // Iterative call to get all super fields
-    private static IMethodBinding[] getAllSuperMethods(ITypeBinding iTypeBinding) {
+    public static IMethodBinding[] getAllSuperMethods(ITypeBinding iTypeBinding) {
         Set<IMethodBinding> allSuperMethods = new HashSet<>();
         Optional<ITypeBinding> superclass = Optional.ofNullable(iTypeBinding.getSuperclass());
         while (superclass.isPresent() && !superclass.get().getName().equals(OBJECT)) {
