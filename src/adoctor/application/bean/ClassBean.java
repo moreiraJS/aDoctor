@@ -9,7 +9,7 @@ public class ClassBean extends Bean {
     private File sourceFile;
     private TypeDeclaration typeDeclaration;
     private String qualifiedName;
-    private HashMap<String, ClassBean> descendents;
+    private HashMap<String, ClassBean> descendents = new HashMap<>();
 
     public String getQualifiedName() {
         return qualifiedName;
