@@ -42,10 +42,30 @@ public class MIMAnalyzer extends ClassSmellAnalyzer {
         return false;
     }
 
-    public static boolean isOverride(MethodDeclaration methodDecl, IMethodBinding[] superMethods) {
+    private static boolean matchSignature(MethodDeclaration methodDecl, IMethodBinding superMethod){
         String methodName = methodDecl.getName().getIdentifier();
+        if(!superMethod.getName().equals(methodName))
+            return false;
+
+        List<SingleVariableDeclaration> methodParameters = methodDecl.parameters();
+        ITypeBinding[] superTypes = superMethod.getParameterTypes();
+        if(methodParameters.size() != superTypes.length)
+            return false;
+
+        int i=0;
+        for (SingleVariableDeclaration parameter: methodParameters){
+            ITypeBinding methodParameterType = parameter.getType().resolveBinding();
+            if(methodParameterType != null &&
+                    !methodParameterType.getQualifiedName().equals(superTypes[i].getQualifiedName()))
+                return false;
+            i++;
+        }
+        return true;
+    }
+
+    public static boolean isOverride(MethodDeclaration methodDecl, IMethodBinding[] superMethods) {
         // Check if the analyzed method IS an overriden method
-        return Arrays.stream(superMethods).anyMatch(sMethod -> sMethod.getName().equals(methodName));
+        return Arrays.stream(superMethods).anyMatch(sMethod -> matchSignature(methodDecl, sMethod));
     }
 
     public static boolean doesInternalCall(MethodDeclaration methodDecl) {
