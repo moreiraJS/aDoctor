@@ -48,7 +48,7 @@ public class IDSAnalyzer extends ClassSmellAnalyzer {
         return null;
     }
 
-    private static boolean hasHashMapIntegerObjectType(Type typeNode) {
+    public static boolean hasHashMapIntegerObjectType(Type typeNode) {
         if (!typeNode.isParameterizedType()) {
             return false;
         }

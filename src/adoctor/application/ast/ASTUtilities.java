@@ -102,6 +102,26 @@ public class ASTUtilities {
         }
     }
 
+    public static List<ForStatement> getForStatements(ASTNode node) {
+        if (node == null) {
+            return null;
+        } else {
+            ArrayList<ForStatement> forStatements = new ArrayList<>();
+            node.accept(new ForStatementVIsitor(forStatements));
+            return forStatements;
+        }
+    }
+
+    public static List<EnhancedForStatement> getEnhancedForStatements(ASTNode node) {
+        if (node == null) {
+            return null;
+        } else {
+            ArrayList<EnhancedForStatement> enhancedForStatements = new ArrayList<>();
+            node.accept(new EnhancedForStatementVisitor(enhancedForStatements));
+            return enhancedForStatements;
+        }
+    }
+
     public static List<ThisExpression> getThisExpressions(ASTNode node) {
         if (node == null) {
             return null;
