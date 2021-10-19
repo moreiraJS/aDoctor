@@ -27,7 +27,9 @@ public class MIMAnalyzer extends ClassSmellAnalyzer {
                 } else {
                     String nameId = name.getIdentifier();
                     // Check if the referenced name IS NOT a local variable
-                    if (localNames.stream().noneMatch(dName -> dName.getIdentifier().equals(nameId))) {
+                    if (localNames.stream().noneMatch(dName ->
+                            !dName.getIdentifier().equals(methodDecl.getName().getIdentifier())
+                                    && dName.getIdentifier().equals(nameId))) {
                         boolean isInternalField = internalFields.stream().anyMatch(iField -> iField.getIdentifier().equals(nameId));
                         boolean isSuperField = Arrays.stream(superFields).anyMatch(sField -> sField.getName().equals(nameId));
                         boolean isSuperMethod = Arrays.stream(superMethods).anyMatch(sMethod -> sMethod.getName().equals(nameId));

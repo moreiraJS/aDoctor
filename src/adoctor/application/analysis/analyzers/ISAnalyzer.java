@@ -55,8 +55,8 @@ public class ISAnalyzer extends ClassSmellAnalyzer {
                         // Setter name check
                         String instanceVarName = instanceVar.getValue();
                         char varFirstLetter = instanceVarName.charAt(0);
-                        if (methodName.equals("set" + Character.toUpperCase(varFirstLetter) + instanceVarName
-                                .substring(1))) {
+                        if (methodName.startsWith("set")){
+                                //+ Character.toUpperCase(varFirstLetter) + instanceVarName.substring(1))) {
                             // Assignment check
                             if (setterAssignmentCheck(methodDecl, instanceVarName)) {
                                 Pair<MethodDeclaration, String> couple = new MutablePair<>(methodDecl, instanceVarName);
@@ -128,18 +128,24 @@ public class ISAnalyzer extends ClassSmellAnalyzer {
     private static boolean setterAssignmentCheck(MethodDeclaration methodDecl, String instanceVarName) {
         // Assignment check
         List<Statement> statements = methodDecl.getBody().statements();
+        if(statements.size()>1)
+            return false;
         for (Statement statement : statements) {
             if (statement instanceof ExpressionStatement) {
                 Expression expr = ((ExpressionStatement) statement).getExpression();
                 if (expr instanceof Assignment) {
                     Expression leftExpr = ((Assignment) expr).getLeftHandSide();
-                    Expression rightExpr = ((Assignment) expr).getRightHandSide();
-                    if (rightExpr.toString().equals(instanceVarName)) {
-                        return leftExpr.toString().equals(instanceVarName)
+                    return leftExpr.toString().equals(instanceVarName)
                                 || leftExpr instanceof FieldAccess
-                                && ((FieldAccess) leftExpr).getExpression().toString().equals("this")
                                 && ((FieldAccess) leftExpr).getName().getIdentifier().equals(instanceVarName);
-                    }
+//                    Expression leftExpr = ((Assignment) expr).getLeftHandSide();
+//                    Expression rightExpr = ((Assignment) expr).getRightHandSide();
+//                    if (rightExpr.toString().equals(instanceVarName)) {
+//                        return leftExpr.toString().equals(instanceVarName)
+//                                || leftExpr instanceof FieldAccess
+//                                && ((FieldAccess) leftExpr).getExpression().toString().equals("this")
+//                                && ((FieldAccess) leftExpr).getName().getIdentifier().equals(instanceVarName);
+//                    }
                 }
             }
         }
